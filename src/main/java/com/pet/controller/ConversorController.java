@@ -51,7 +51,32 @@ public class ConversorController {
 		
 	}
 	
-	
+	@GetMapping("/dec2bin/{decimal}")
+	@Operation(
+			summary = "Converte decimal para binário",
+			description = "Recebe um valor decimal e retorna o correspondente binário"
+	)
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200",
+				description = "Conversão realizada com sucesso"
+		),
+		@ApiResponse(
+				responseCode = "400",
+				description = "Número decimal inválido"
+		)
+	})
+	public ResponseEntity<ConversorResponse> dec2bin(@PathVariable Integer decimal) {
+		
+		if (decimal == null || decimal < 0) {
+	        throw new InvalidBinaryException("O valor informado deve ser um número inteiro maior ou igual a zero");
+	    }
+		
+		String binario= service.dec2bin(decimal);
+		
+		return ResponseEntity.ok(new ConversorResponse(binario, decimal));
+		
+	}
 	
 }
 
