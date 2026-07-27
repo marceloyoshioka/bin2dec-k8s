@@ -1,134 +1,100 @@
-﻿# 🚀 Bin2Dec API — Prática de Containerização e Kubernetes
-
-Este repositório contém uma API REST desenvolvida em **Spring Boot** para conversão de números binários em decimais (**Bin2Dec**), utilizada como projeto prático para o estudo e aplicação de conceitos de **Containerização (Docker)** e **Orquestração de Containers (Kubernetes)**.
-
-O objetivo deste projeto é documentar e praticar a jornada completa, desde a criação da imagem Docker até sua implantação e gerenciamento em um cluster Kubernetes local.
-
 ---
 
-# 🛠️ Tecnologias Utilizadas
+## 📌 Visão Geral da API
 
-| Categoria | Tecnologia |
-|-----------|------------|
-| **Aplicação** | Java 17, Spring Boot, Maven |
-| **Documentação da API** | SpringDoc / OpenAPI (Swagger UI) |
-| **Containerização** | Docker (Multi-stage Build) |
-| **Registro de Imagens** | Docker Hub (`petersonmarcelo/bin2dec-api:v1.0`) |
-| **Orquestração** | Kubernetes (Minikube / Docker Desktop / Kind) |
-
----
-
-# 📌 Visão Geral da API
-
-A API disponibiliza um serviço para conversão de números binários em decimais e conta com documentação interativa utilizando o Swagger.
+A API realiza a conversão de números binários para decimais e disponibiliza documentação interativa através do Swagger UI.
 
 | Recurso | Endpoint |
 |---------|----------|
-| **Swagger UI** | `http://localhost:8080/swagger-ui.html` |
-| **Conversão Binário → Decimal** | `GET /api/v1/convert?bin={numero_binario}` |
+| **Swagger UI** | `http://localhost:30080/swagger-ui/index.html` |
+| **Conversão** | `GET /api/v1/convert?bin={numero_binario}` |
 
 ---
 
-# 🧱 Arquitetura de Containerização (Docker)
+# 🐳 Docker
 
-Para reduzir o tamanho da imagem e melhorar a segurança da aplicação, foi utilizada a estratégia de **Multi-Stage Build**.
+A aplicação foi containerizada utilizando **Docker** com **Multi-Stage Build**, produzindo uma imagem otimizada para execução.
 
-## 📦 Estágio 1 — Builder
+### Principais etapas
 
-Responsável por:
-
-- Utilizar uma imagem contendo **Maven** e **JDK 17**;
-- Baixar todas as dependências do projeto;
-- Compilar o código-fonte Java;
-- Gerar o arquivo executável `.jar`.
-
-## 🚀 Estágio 2 — Runner
-
-Responsável por:
-
-- Utilizar uma imagem enxuta baseada em **Alpine Linux** com **JRE 17**;
-- Copiar apenas o `.jar` produzido no estágio anterior;
-- Gerar uma imagem menor, mais rápida e adequada para ambientes de produção.
-
----
-
-# 🚀 Etapas Executadas
-
-## 1️⃣ Construção da imagem Docker
-
-Na raiz do projeto, execute:
+- Build da imagem Docker
+- Execução local para validação
+- Publicação da imagem no Docker Hub
 
 ```bash
 docker build -t petersonmarcelo/bin2dec-api:v1.0 .
-```
-
----
-
-## 2️⃣ Execução do container localmente
-
-Após o build da imagem, execute o container:
-
-```bash
-docker run -d \
-  -p 8080:8080 \
-  --name bin2dec-container \
-  petersonmarcelo/bin2dec-api:v1.0
-```
-
-Em seguida, acesse a documentação da API:
-
-```text
-http://localhost:8080/swagger-ui.html
-```
-
----
-
-## 3️⃣ Publicação no Docker Hub
-
-Realize o login:
-
-```bash
-docker login
-```
-
-Envie a imagem para o Docker Hub:
-
-```bash
+docker run -d -p 8080:8080 --name bin2dec-container petersonmarcelo/bin2dec-api:v1.0
 docker push petersonmarcelo/bin2dec-api:v1.0
 ```
 
-Imagem publicada:
+---
 
-```text
-petersonmarcelo/bin2dec-api:v1.0
+# ☸️ Kubernetes
+
+Após a publicação da imagem, a aplicação foi implantada em um cluster Kubernetes utilizando manifestos declarativos.
+
+## Recursos utilizados
+
+- **Pod** para execução inicial da aplicação.
+- **Service (NodePort)** para exposição da API.
+- **Deployment** com duas réplicas para alta disponibilidade.
+- **ConfigMap** para externalização das configurações.
+
+---
+
+# 🧪 Experimentos Realizados
+
+Durante o desenvolvimento foram realizados alguns experimentos para validar o funcionamento do Kubernetes.
+
+| Experimento | Objetivo |
+|-------------|----------|
+| **Self-Healing** | Verificar a recriação automática de Pods após falhas. |
+| **Requests & Limits** | Controlar o consumo de CPU e memória da aplicação. |
+| **ConfigMap** | Separar configurações da imagem Docker e do código-fonte. |
+
+---
+
+# 📁 Estrutura dos Manifestos
+
+| Arquivo | Finalidade |
+|----------|------------|
+| `configmap.yaml` | Variáveis de ambiente da aplicação |
+| `deployment.yaml` | Deployment com 2 réplicas e limites de recursos |
+| `svc-bin2dec-nodeport.yaml` | Exposição da API através de um Service NodePort |
+
+---
+
+# 🚀 Executando o Projeto
+
+Aplicar todos os manifestos:
+
+```bash
+kubectl apply -f k8s/
+```
+
+Verificar os recursos:
+
+```bash
+kubectl get all
+```
+
+Remover todos os recursos:
+
+```bash
+kubectl delete -f k8s/
 ```
 
 ---
 
-# ☸️ Próximos Passos (Kubernetes)
+# 🎯 Conceitos Praticados
 
-- [ ] Criar os manifestos YAML (`Deployment` e `Service`).
-- [ ] Implantar a aplicação no cluster Kubernetes.
-- [ ] Validar o funcionamento dos Pods.
-- [ ] Expor a API utilizando um `Service`.
-- [ ] Configurar réplicas da aplicação.
-- [ ] Implementar `requests` e `limits` de CPU e memória.
-- [ ] Realizar testes de escalabilidade.
-- [ ] Documentar todo o fluxo de implantação no Kubernetes.
-
----
-
-# 🎯 Objetivos de Aprendizagem
-
-Durante este projeto estão sendo praticados conceitos como:
-
-- ✅ Criação de imagens Docker
-- ✅ Multi-Stage Build
+- ✅ Docker e Multi-Stage Build
 - ✅ Publicação de imagens no Docker Hub
-- ✅ Execução de containers Docker
-- ✅ Criação de manifestos Kubernetes
-- ✅ Deploy de aplicações em clusters
-- ✅ Gerenciamento de Pods
-- ✅ Exposição de serviços com Kubernetes
-- ✅ Boas práticas de containerização
-- ✅ Preparação de aplicações para ambientes de produção
+- ✅ Pods
+- ✅ Deployments
+- ✅ Services (NodePort)
+- ✅ ConfigMaps
+- ✅ Self-Healing
+- ✅ Requests e Limits
+- ✅ Gerenciamento de réplicas
+- ✅ Externalização de configurações
