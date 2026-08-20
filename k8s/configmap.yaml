@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bin2dec-config
+data:
+  APP_PORT: "8080"
+  APP_ENV: "desenvolvimento"
+  APP_NAME: "Bin2Dec API"
